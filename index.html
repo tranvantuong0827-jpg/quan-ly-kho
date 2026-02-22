@@ -2,177 +2,126 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no text-center">
-    <title>Kho Bảo Mật - Tường</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kho & Doanh Thu - Tường</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .animate-pulse-custom { animation: pulse 1s infinite; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen">
 
-    <div id="login-screen" class="max-w-md mx-auto p-6 pt-20">
-        <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl text-center space-y-6 border border-white">
-            <div class="text-6xl mb-2">🔓</div>
-            <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Đăng Nhập Kho</h2>
-            <div class="space-y-4 text-left">
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1 ml-2 uppercase">Mã nhân viên</label>
-                    <input id="userId" type="text" placeholder="Ví dụ: nv01" class="w-full border-0 bg-slate-100 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1 ml-2 uppercase">Mật khẩu</label>
-                    <input id="userPw" type="password" placeholder="••••••" class="w-full border-0 bg-slate-100 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold">
-                </div>
-                <button onclick="login()" id="btnLogin" class="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg hover:bg-blue-700 active:scale-95 transition-all uppercase mt-4">Vào Hệ Thống</button>
-            </div>
+    <div id="login-screen" class="max-w-md mx-auto p-6 pt-10">
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl text-center space-y-4 border border-white">
+            <div class="text-5xl">💰</div>
+            <h2 class="text-2xl font-black text-slate-800 uppercase italic">Kho & Doanh Thu</h2>
+            <input id="userId" type="text" placeholder="Mã nhân viên" class="w-full bg-slate-100 p-4 rounded-2xl outline-none font-bold border-0">
+            <input id="userPw" type="password" placeholder="Mật khẩu" class="w-full bg-slate-100 p-4 rounded-2xl outline-none font-bold border-0">
+            <button onclick="login()" id="btnLogin" class="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg uppercase">Đăng Nhập</button>
         </div>
     </div>
 
     <div id="main-screen" class="hidden max-w-md mx-auto p-4 space-y-4">
-        <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-white text-sm">
-            <span id="welcomeMsg" class="font-bold text-blue-700 italic text-center">Chào bạn!</span>
-            <button onclick="location.reload()" class="bg-red-50 px-3 py-1 rounded-full text-red-500 font-bold uppercase text-[10px]">Thoát</button>
+        <div class="grid grid-cols-2 gap-3">
+            <div class="bg-gradient-to-br from-blue-600 to-blue-700 p-4 rounded-3xl text-white shadow-lg">
+                <p class="text-[10px] font-bold uppercase opacity-80">Hôm nay</p>
+                <p id="statDay" class="text-lg font-black tracking-tighter">0đ</p>
+            </div>
+            <div class="bg-gradient-to-br from-emerald-600 to-emerald-700 p-4 rounded-3xl text-white shadow-lg">
+                <p class="text-[10px] font-bold uppercase opacity-80">Tháng này</p>
+                <p id="statMonth" class="text-lg font-black tracking-tighter">0đ</p>
+            </div>
         </div>
 
-        <div class="bg-white p-6 rounded-[2.5rem] shadow-xl space-y-4 border border-white">
-            <h1 class="text-xl font-black text-center text-slate-800 uppercase italic">Quản Lý Giao Dịch</h1>
-            <div>
-                <input id="pName" list="product-list" type="text" placeholder="Tên sản phẩm..." class="w-full bg-slate-50 p-4 rounded-2xl outline-none border-0 focus:ring-2 focus:ring-blue-500 font-medium text-lg">
-                <datalist id="product-list"></datalist>
-            </div>
+        <div class="bg-white p-6 rounded-[2.5rem] shadow-xl space-y-4 border border-white text-center">
+            <input id="pName" list="product-list" type="text" placeholder="Tên sản phẩm..." class="w-full bg-slate-50 p-4 rounded-2xl outline-none border-0 font-medium">
+            <datalist id="product-list"></datalist>
+            
             <div class="grid grid-cols-2 gap-3">
-                <input id="pQty" type="number" placeholder="Số lượng" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border-0 text-center font-black text-xl">
-                <select id="pType" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border-0 font-bold text-blue-600 text-center uppercase">
-                    <option value="Nhập">➕ NHẬP</option>
-                    <option value="Xuất">➖ XUẤT</option>
-                    <option value="Hao hụt">⚠️ HAO HỤT</option>
-                </select>
+                <input id="pQty" type="number" placeholder="SL" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border-0 text-center font-black">
+                <input id="pPrice" type="number" placeholder="Giá tiền" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border-0 text-center font-black text-blue-600">
             </div>
-            <button onclick="saveData()" id="btnSave" class="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg active:scale-95 transition-all text-xl uppercase">Lưu Dữ Liệu</button>
+            
+            <select id="pType" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border-0 font-bold text-slate-600">
+                <option value="Xuất">➖ BÁN RA (TÍNH DT)</option>
+                <option value="Nhập">➕ NHẬP KHO</option>
+                <option value="Hao hụt">⚠️ HAO HỤT</option>
+            </select>
+            <button onclick="saveData()" id="btnSave" class="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg text-xl uppercase">Lưu Giao Dịch</button>
         </div>
 
         <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-white">
-            <div class="flex justify-between items-center mb-4 font-black text-blue-800 italic text-lg uppercase tracking-tight">
-                <span>Tồn Kho Thực Tế</span>
-                <button onclick="fetchData()" class="text-blue-500 font-bold p-2 bg-blue-50 rounded-full">🔄</button>
+            <div class="flex justify-between items-center mb-4 font-black text-slate-800 text-lg uppercase italic">
+                <span>Tồn kho</span>
+                <input type="text" id="searchInput" onkeyup="filterStock()" placeholder="🔍 Tìm..." class="w-1/2 bg-slate-100 p-2 rounded-xl text-xs outline-none border-0">
             </div>
-
-            <div class="relative mb-6">
-                <input type="text" id="searchInput" onkeyup="filterStock()" placeholder="🔍 Tìm nhanh sản phẩm..." class="w-full bg-slate-100 p-4 rounded-2xl outline-none border-0 focus:ring-2 focus:ring-blue-400 text-sm font-medium">
-            </div>
-            
-            <div id="inventoryList" class="space-y-4 divide-y divide-slate-50 min-h-[100px]">
-                <div class="text-center py-5 text-slate-400 text-sm italic">Đang tải dữ liệu...</div>
-            </div>
+            <div id="inventoryList" class="space-y-3 divide-y divide-slate-50">Đang tải...</div>
         </div>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx99f63pC8wwTKvMyEFcfEjoDw6EtJnSOtBIm7-Wn05xKxf7mIU0GP0c8tJd-FKuGOD/exec";
+        const SCRIPT_URL = "DÁN_LINK_SCRIPT_CỦA_BẠN_VÀO_ĐÂY";
         let currentUser = "";
-        let fullStockData = [];
+        let fullData = [];
 
         async function login() {
-            const id = document.getElementById('userId').value.trim();
-            const pw = document.getElementById('userPw').value.trim();
-            const btn = document.getElementById('btnLogin');
-            if(!id || !pw) return alert("Nhập đủ ID và Pass!");
-            btn.innerText = "⌛ ĐANG KIỂM TRA...";
-            try {
-                const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "login", id: id, pw: pw }) });
-                const result = await res.json();
-                if (result.status === "success") {
-                    currentUser = result.name;
-                    document.getElementById('login-screen').classList.add('hidden');
-                    document.getElementById('main-screen').classList.remove('hidden');
-                    document.getElementById('welcomeMsg').innerText = "Chào: " + currentUser;
-                    fetchData();
-                } else { alert("Sai ID hoặc mật khẩu!"); btn.innerText = "VÀO HỆ THỐNG"; }
-            } catch (e) { alert("Lỗi kết nối!"); btn.innerText = "THỬ LẠI"; }
+            const id = document.getElementById('userId').value, pw = document.getElementById('userPw').value;
+            const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "login", id: id, pw: pw }) });
+            const result = await res.json();
+            if (result.status === "success") {
+                currentUser = result.name;
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('main-screen').classList.remove('hidden');
+                fetchData();
+            } else alert("Sai tài khoản!");
         }
 
         async function saveData() {
-            const name = document.getElementById('pName').value.trim();
-            const qty = parseFloat(document.getElementById('pQty').value);
-            const type = document.getElementById('pType').value;
-            const btn = document.getElementById('btnSave');
-
-            if (!name || isNaN(qty)) return alert("Vui lòng nhập đủ!");
-
-            btn.innerText = "⌛ ĐANG GỬI...";
-            btn.disabled = true;
-
-            try {
-                const response = await fetch(SCRIPT_URL, { 
-                    method: "POST", 
-                    body: JSON.stringify({ name, qty, type, user: currentUser }) 
-                });
-                
-                // THÔNG BÁO KHI LƯU THÀNH CÔNG
-                alert("✅ CẬP NHẬT THÀNH CÔNG!\n\n🔹 Sản phẩm: " + name + "\n🔹 Loại hình: " + type + "\n🔹 Số lượng: " + qty);
-                
-                document.getElementById('pQty').value = "";
-                // Nếu muốn xóa luôn tên sản phẩm sau khi lưu thì bỏ comment dòng dưới:
-                // document.getElementById('pName').value = "";
-                
-                fetchData();
-            } catch (e) { 
-                alert("❌ LỖI: Không thể lưu dữ liệu!"); 
-            } finally {
-                btn.innerText = "LƯU DỮ LIỆU";
-                btn.disabled = false;
-            }
+            const name = document.getElementById('pName').value, qty = document.getElementById('pQty').value, price = document.getElementById('pPrice').value, type = document.getElementById('pType').value;
+            if(!name || !qty) return alert("Nhập đủ tên và SL!");
+            document.getElementById('btnSave').innerText = "ĐANG LƯU...";
+            await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ name, qty, price, type, user: currentUser }) });
+            alert("Đã lưu thành công!");
+            document.getElementById('pQty').value = ""; document.getElementById('pPrice').value = "";
+            document.getElementById('btnSave').innerText = "LƯU GIAO DỊCH";
+            fetchData();
         }
 
         async function fetchData() {
-            const listDiv = document.getElementById('inventoryList');
-            const dataList = document.getElementById('product-list');
-            try {
-                const res = await fetch(SCRIPT_URL);
-                const data = await res.json();
-                let stock = {};
-                data.forEach(row => {
-                    const n = row[1], t = row[2], q = Number(row[3]);
-                    if (!stock[n]) stock[n] = 0;
-                    (t === "Nhập") ? stock[n] += q : stock[n] -= q;
-                });
-                
-                fullStockData = [];
-                dataList.innerHTML = "";
-                for (let item in stock) {
-                    fullStockData.push({ name: item, count: stock[item] });
-                    dataList.innerHTML += '<option value="' + item + '">';
+            const res = await fetch(SCRIPT_URL);
+            fullData = await res.json();
+            
+            let stock = {}, revenueDay = 0, revenueMonth = 0;
+            const today = new Date().toLocaleDateString();
+            const thisMonth = new Date().getMonth();
+            const thisYear = new Date().getFullYear();
+
+            fullData.forEach(row => {
+                const date = new Date(row[0]), name = row[1], type = row[2], qty = Number(row[3]), total = Number(row[7]) || 0;
+                // Tính tồn kho
+                if (!stock[name]) stock[name] = 0;
+                (type === "Nhập") ? stock[name] += qty : stock[name] -= qty;
+                // Tính doanh thu (Chỉ tính loại "Xuất")
+                if (type === "Xuất") {
+                    if (date.toLocaleDateString() === today) revenueDay += total;
+                    if (date.getMonth() === thisMonth && date.getFullYear() === thisYear) revenueMonth += total;
                 }
-                renderList(fullStockData);
-            } catch (e) { listDiv.innerHTML = "Lỗi load dữ liệu."; }
+            });
+
+            document.getElementById('statDay').innerText = revenueDay.toLocaleString() + "đ";
+            document.getElementById('statMonth').innerText = revenueMonth.toLocaleString() + "đ";
+            
+            renderStock(stock);
         }
 
-        function renderList(items) {
+        function renderStock(stock) {
             const listDiv = document.getElementById('inventoryList');
             listDiv.innerHTML = "";
-            if(items.length === 0) {
-                listDiv.innerHTML = '<div class="text-center py-5 text-slate-400 text-sm italic text-center">Không tìm thấy sản phẩm này</div>';
-                return;
+            for (let item in stock) {
+                const c = stock[item];
+                listDiv.innerHTML += `<div class="flex justify-between items-center py-2"><span class="font-bold text-slate-700 uppercase text-sm">${item}</span><span class="font-black ${c<=10?'text-red-600':'text-emerald-600'}">${c}</span></div>`;
             }
-            items.forEach(item => {
-                const isLow = item.count <= 10;
-                const color = isLow ? 'text-red-600' : 'text-emerald-600';
-                const warn = isLow ? ' <span class="text-[9px] bg-red-600 text-white px-2 py-0.5 rounded animate-pulse-custom uppercase">Sắp hết</span>' : '';
-                listDiv.innerHTML += '<div class="flex justify-between items-center pt-4 pb-2 border-b border-slate-50">' +
-                    '<div><div class="font-bold text-slate-700 uppercase">' + item.name + '</div>' + warn + '</div>' +
-                    '<span class="text-xl font-black ' + color + '">' + item.count.toLocaleString() + '</span></div>';
-            });
-        }
-
-        function filterStock() {
-            const keyword = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = fullStockData.filter(item => 
-                item.name.toLowerCase().includes(keyword)
-            );
-            renderList(filtered);
         }
     </script>
 </body>
