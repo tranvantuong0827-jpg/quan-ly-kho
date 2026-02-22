@@ -13,14 +13,15 @@
 <body class="bg-slate-100 min-h-screen p-4">
     <div class="max-w-md mx-auto space-y-4">
         <div class="text-center py-4">
-            <h1 class="text-3xl font-black text-blue-800 tracking-tight">📦 KHO CỦA TƯỜNG</h1>
-            <p class="text-slate-500 text-sm font-semibold uppercase tracking-widest">Tồn kho sau biến động (Cột E)</p>
+            <h1 class="text-3xl font-black text-blue-800 tracking-tight text-center uppercase">Kho Của Tường</h1>
         </div>
 
         <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-white space-y-4">
             <div>
-                <label class="block text-xs font-bold text-slate-400 mb-1 ml-2 uppercase">Tên sản phẩm</label>
-                <input id="pName" type="text" placeholder="Tên cá, thiết bị..." class="w-full border-0 bg-slate-50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-lg">
+                <label class="block text-xs font-bold text-slate-400 mb-1 ml-2 uppercase">Sản phẩm (Chọn hoặc tự nhập)</label>
+                <input id="pName" list="product-list" type="text" placeholder="Gõ tên hoặc chọn..." class="w-full border-0 bg-slate-50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-lg">
+                <datalist id="product-list">
+                    </datalist>
             </div>
             
             <div class="grid grid-cols-2 gap-3">
@@ -33,30 +34,25 @@
                     <select id="pType" class="w-full border-0 bg-slate-50 p-4 rounded-2xl outline-none font-bold text-blue-600">
                         <option value="Nhập">➕ NHẬP</option>
                         <option value="Xuất">➖ XUẤT</option>
+                        <option value="Hao hụt">⚠️ HAO HỤT</option>
                     </select>
                 </div>
             </div>
 
-            <button onclick="saveData()" id="btnSave" class="w-full bg-blue-600 text-white font-black py-5 rounded-2xl active:scale-95 transition-all shadow-lg text-xl uppercase">
-                Lưu dữ liệu
-            </button>
+            <button onclick="saveData()" id="btnSave" class="w-full bg-blue-600 text-white font-black py-5 rounded-2xl active:scale-95 transition-all shadow-lg text-xl uppercase">Lưu dữ liệu</button>
         </div>
 
         <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-white">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="font-black text-slate-800 text-xl italic text-blue-700">TỒN KHO THỰC TẾ</h2>
-                <button onclick="fetchData()" class="bg-blue-50 p-2 rounded-full text-blue-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                </button>
+            <div class="flex justify-between items-center mb-6 text-blue-700 font-black italic text-xl">
+                <h2>TỒN KHO THỰC TẾ</h2>
+                <button onclick="fetchData()" class="bg-blue-50 p-2 rounded-full"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg></button>
             </div>
-            <div id="inventoryList" class="space-y-4">
-                <div class="text-center py-10 text-slate-400 italic font-medium">Đang kết nối kho...</div>
-            </div>
+            <div id="inventoryList" class="space-y-4">Đang tải...</div>
         </div>
     </div>
 
     <script>
-        // ĐÃ CẬP NHẬT LINK SCRIPT MỚI CỦA TƯỜNG TẠI ĐÂY
+        // DÁN LINK SCRIPT MỚI CỦA BẠN VÀO ĐÂY
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxW6rpTCq2klcAh1ASgQ5uRcFWwwj9qHhtfCIojAZE3eMyc2lY8L2XoNm58_DfoMYVV/exec";
 
         async function saveData() {
@@ -64,33 +60,24 @@
             const qty = parseFloat(document.getElementById('pQty').value);
             const type = document.getElementById('pType').value;
             const btn = document.getElementById('btnSave');
-
-            if (!name || isNaN(qty)) return alert("Nhập đủ tên và số lượng Tường ơi!");
-            
-            btn.disabled = true;
-            btn.innerText = "⏳ ĐANG GỬI...";
-
+            if (!name || isNaN(qty)) return alert("Nhập thiếu rồi!");
+            btn.disabled = true; btn.innerText = "ĐANG LƯU...";
             try {
                 await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ name, qty, type }) });
                 document.getElementById('pQty').value = "";
-                document.getElementById('pName').value = "";
-                fetchData();
-                alert("Đã ghi vào cột E thành công!");
-            } catch (e) {
-                alert("Lỗi! Kiểm tra lại mạng hoặc link Script.");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "LƯU DỮ LIỆU";
-            }
+                await fetchData();
+                alert("Đã lưu biến động vào cột E!");
+            } catch (e) { alert("Lỗi!"); }
+            finally { btn.disabled = false; btn.innerText = "LƯU DỮ LIỆU"; }
         }
 
         async function fetchData() {
             const listDiv = document.getElementById('inventoryList');
+            const dataList = document.getElementById('product-list');
             try {
                 const response = await fetch(SCRIPT_URL);
                 const data = await response.json();
                 let stock = {};
-
                 data.forEach(row => {
                     const name = row[1], type = row[2], qty = Number(row[3]);
                     if (!stock[name]) stock[name] = 0;
@@ -99,18 +86,21 @@
                 });
 
                 listDiv.innerHTML = "";
+                dataList.innerHTML = ""; // Xóa danh sách gợi ý cũ
+                
                 for (let item in stock) {
                     const count = stock[item];
                     const isLow = count <= 10;
                     const color = isLow ? 'text-red-600' : 'text-emerald-600';
-                    const warning = isLow ? ' <span class="text-[10px] bg-red-600 text-white px-2 py-1 rounded-md font-black animate-pulse-custom ml-2">SẮP HẾT</span>' : '';
+                    const warning = isLow ? ' <span class="text-[10px] bg-red-600 text-white px-2 py-1 rounded-md font-black animate-pulse-custom ml-2 uppercase">Sắp hết</span>' : '';
                     
-                    listDiv.innerHTML += '<div class="flex justify-between items-center pt-4 border-b border-slate-50 pb-2">' +
-                        '<div><div class="font-bold text-slate-700 text-lg uppercase">' + item + '</div>' + warning + '</div>' +
-                        '<span class="text-2xl font-black ' + color + '">' + count.toLocaleString() + '</span>' +
-                    '</div>';
+                    // Hiện tồn kho
+                    listDiv.innerHTML += '<div class="flex justify-between items-center pt-4 border-b border-slate-50 pb-2"><div><div class="font-bold text-slate-700 text-lg uppercase">' + item + '</div>' + warning + '</div><span class="text-2xl font-black ' + color + '">' + count.toLocaleString() + '</span></div>';
+                    
+                    // Thêm vào danh sách gợi ý để chọn
+                    dataList.innerHTML += '<option value="' + item + '">';
                 }
-            } catch (e) { listDiv.innerHTML = "Chưa có dữ liệu."; }
+            } catch (e) { listDiv.innerHTML = "Lỗi tải dữ liệu."; }
         }
         fetchData();
     </script>
