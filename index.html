@@ -5,29 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kho Cá Của Tường</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes pulse-red {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .animate-pulse-custom {
+            animation: pulse-red 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
 </head>
-<body class="bg-slate-50 min-h-screen p-4">
+<body class="bg-slate-100 min-h-screen p-4">
     <div class="max-w-md mx-auto space-y-4">
-        <h1 class="text-2xl font-bold text-center text-blue-700 py-4">📦 QUẢN LÝ KHO CÁ</h1>
-
-        <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 space-y-3">
-            <input id="pName" type="text" placeholder="Tên sản phẩm (Cá Koi...)" class="w-full border-0 bg-slate-100 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
-            <div class="flex gap-2">
-                <input id="pQty" type="number" placeholder="Số lượng" class="w-2/3 border-0 bg-slate-100 p-4 rounded-2xl outline-none">
-                <select id="pType" class="w-1/3 border-0 bg-slate-100 p-4 rounded-2xl outline-none font-bold">
-                    <option value="Nhập">NHẬP (+)</option>
-                    <option value="Xuất">XUẤT (-)</option>
-                </select>
-            </div>
-            <button onclick="saveData()" id="btnSave" class="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl active:scale-95 shadow-lg shadow-blue-200">LƯU DỮ LIỆU</button>
+        <div class="text-center py-4">
+            <h1 class="text-3xl font-black text-blue-800 tracking-tight">📦 KHO CỦA TƯỜNG</h1>
+            <p class="text-slate-500 text-sm font-semibold uppercase tracking-widest">Hệ thống quản lý cá cảnh</p>
         </div>
 
-        <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="font-bold text-slate-700 italic text-lg">Tồn kho hiện tại</h2>
-                <button onclick="fetchData()" class="text-blue-500 font-bold">Làm mới 🔄</button>
+        <div class="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-blue-100/50 border border-white space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-400 mb-1 ml-2 uppercase">Tên sản phẩm</label>
+                <input id="pName" type="text" placeholder="Cá Koi, Bể cá..." class="w-full border-0 bg-slate-50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-lg font-medium">
             </div>
-            <div id="inventoryList" class="space-y-4">Đang tải...</div>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1 ml-2 uppercase">Số lượng</label>
+                    <input id="pQty" type="number" placeholder="0" class="w-full border-0 bg-slate-50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-lg font-bold">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1 ml-2 uppercase">Loại hình</label>
+                    <select id="pType" class="w-full border-0 bg-slate-50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-blue-600">
+                        <option value="Nhập">➕ NHẬP</option>
+                        <option value="Xuất">➖ XUẤT</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="saveData()" id="btnSave" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-2xl active:scale-95 transition-all shadow-lg shadow-blue-200 text-xl uppercase tracking-wider">
+                Lưu dữ liệu
+            </button>
+        </div>
+
+        <div class="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-blue-100/50 border border-white">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="font-black text-slate-800 text-xl">TỒN KHO THỰC TẾ</h2>
+                <button onclick="fetchData()" class="bg-blue-50 p-2 rounded-full text-blue-600 hover:rotate-180 transition-all duration-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                </button>
+            </div>
+            
+            <div id="inventoryList" class="space-y-4 divide-y divide-slate-50">
+                <div class="text-center py-10 text-slate-400 font-medium italic">Đang tải dữ liệu...</div>
+            </div>
         </div>
     </div>
 
@@ -39,16 +69,26 @@
             const qty = parseFloat(document.getElementById('pQty').value);
             const type = document.getElementById('pType').value;
             const btn = document.getElementById('btnSave');
-            if (!name || isNaN(qty)) return alert("Vui lòng nhập đủ!");
-            btn.disabled = true; btn.innerText = "ĐANG LƯU...";
+
+            if (!name || isNaN(qty)) {
+                alert("Tường ơi, nhập thiếu tên hoặc số lượng rồi!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = "⌛ ĐANG LƯU...";
+
             try {
                 await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ name, qty, type }) });
                 document.getElementById('pQty').value = "";
                 document.getElementById('pName').value = "";
                 await fetchData();
-                alert("Đã lưu xong!");
-            } catch (e) { alert("Lỗi kết nối!"); }
-            finally { btn.disabled = false; btn.innerText = "LƯU DỮ LIỆU"; }
+            } catch (e) {
+                alert("Lỗi kết nối mạng rồi!");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "LƯU DỮ LIỆU";
+            }
         }
 
         async function fetchData() {
@@ -57,6 +97,7 @@
                 const response = await fetch(SCRIPT_URL);
                 const data = await response.json();
                 let stock = {};
+
                 data.forEach(row => {
                     const name = row[1];
                     const type = row[2];
@@ -65,20 +106,33 @@
                     if (type === "Nhập") stock[name] += qty;
                     else stock[name] -= qty;
                 });
+
                 listDiv.innerHTML = "";
+                const items = Object.keys(stock);
+                
+                if (items.length === 0) {
+                    listDiv.innerHTML = '<div class="text-center py-10 text-slate-400 italic">Chưa có hàng trong kho</div>';
+                    return;
+                }
+
                 for (let item in stock) {
                     const count = stock[item];
-                    const color = count <= 5 ? 'text-red-500' : 'text-emerald-600';
-                    const warning = count <= 5 ? ' <span class="text-[10px] bg-red-100 px-2 py-0.5 rounded-full uppercase">Sắp hết</span>' : '';
+                    // CẢNH BÁO: Dưới hoặc bằng 10 là báo đỏ nhấp nháy
+                    const isLow = count <= 10;
+                    const color = isLow ? 'text-red-600' : 'text-emerald-600';
+                    const warning = isLow ? ' <span class="text-[10px] bg-red-600 text-white px-2 py-1 rounded-md font-black animate-pulse-custom ml-2">SẮP HẾT</span>' : '';
                     
-                    // Cách viết cộng chuỗi cổ điển để không bị lỗi hiển thị
-                    listDiv.innerHTML += '<div class="flex justify-between items-center pt-2 border-b border-slate-50 pb-2">' +
-                        '<div><span class="font-semibold text-slate-700">' + item + '</span>' + warning + '</div>' +
-                        '<span class="font-bold text-lg ' + color + '">' + count + '</span>' +
+                    listDiv.innerHTML += '<div class="flex justify-between items-center pt-4 pb-1">' +
+                        '<div><div class="font-bold text-slate-700 text-lg uppercase">' + item + '</div>' + warning + '</div>' +
+                        '<div class="text-right"><span class="text-2xl font-black ' + color + '">' + count.toLocaleString() + '</span></div>' +
                     '</div>';
                 }
-            } catch (e) { listDiv.innerHTML = "Chưa có dữ liệu."; }
+            } catch (e) {
+                listDiv.innerHTML = '<div class="text-center py-10 text-red-400">Không thể tải dữ liệu</div>';
+            }
         }
+
+        // Tự động tải dữ liệu khi mở trang
         fetchData();
     </script>
 </body>
