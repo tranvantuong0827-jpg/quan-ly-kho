@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kho Của Tường</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <div class="max-w-md mx-auto p-4">
+        <h1 class="text-2xl font-bold text-center text-blue-700 my-6">📦 KIỂM KÊ KHO</h1>
+        <div class="bg-white p-5 rounded-2xl shadow-sm mb-6 border border-slate-200">
+            <div class="space-y-3">
+                <input id="pName" type="text" placeholder="Tên sản phẩm" class="w-full border p-3 rounded-xl outline-none">
+                <div class="flex gap-2">
+                    <input id="pQty" type="number" placeholder="Số lượng" class="w-2/3 border p-3 rounded-xl outline-none">
+                    <select id="pType" class="w-1/3 border p-3 rounded-xl bg-white text-sm">
+                        <option value="Nhập">Nhập (+)</option>
+                        <option value="Xuất">Xuất (-)</option>
+                        <option value="Hao hụt">Hao hụt (-)</option>
+                    </select>
+                </div>
+                <button onclick="saveData()" id="btnSave" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl">LƯU DỮ LIỆU</button>
+            </div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="font-semibold text-slate-700">Tồn kho hiện tại</h2>
+                <button onclick="fetchData()" class="text-blue-500 text-sm">Làm mới 🔄</button>
+            </div>
+            <div id="inventoryList" class="space-y-3">Đang tải dữ liệu...</div>
+        </div>
+    </div>
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGCyQNaRq0nABoxH2u2_gpwG2mbYMKrNQzEtGDqALriuZ4CeTjPaz2ZkJK8MM_eXb1/exec";
+        async function saveData() {
+            const name = document.getElementById('pName').value.trim();
+            const qty = parseFloat(document.getElementById('pQty').value);
+            const type = document.getElementById('pType').value;
+            const btn = document.getElementById('btnSave');
+            if (!name || isNaN(qty)) return alert("Vui lòng nhập đủ!");
+            btn.disabled = true; btn.innerText = "ĐANG LƯU...";
+            try {
+                await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ name, qty, type }) });
+                alert("Đã ghi vào Google Sheets thành công!");
+                document.getElementById('pQty').value = "";
+                fetchData();
+            } catch (e) { alert("Lỗi kết nối!"); }
+            finally { btn.disabled = false; btn.innerText = "LƯU DỮ LIỆU"; }
+        }
+        async function fetchData() {
+            const listDiv = document.getElementById('inventoryList');
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const data = await response.json();
+                let stock = {};
+                data.forEach(row => {
+                    const [time, name, type, qty] = row;
+                    if (!stock[name]) stock[name] = 0;
+                    if (type === "Nhập") stock[name] += Number(qty);
+                    else stock[name] -= Number(qty);
+                });
+                listDiv.innerHTML = "";
+                for (let item in stock) {
+                    listDiv.innerHTML += `<div class="flex justify-between border-b pb-2"><span>${item}</span><span class="font-bold \${stock[item] < 0 ? 'text-red-500' : 'text-green-600'}">\${stock[item]}</span></div>`;
+                }
+            } catch (e) { listDiv.innerHTML = "Chưa có dữ liệu."; }
+        }
+        fetchData();
+    </script>
+</body>
+</html>
