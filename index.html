@@ -2,8 +2,8 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hệ Thống Kho - Tường</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no text-center">
+    <title>Kho Bảo Mật - Tường</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
@@ -33,7 +33,7 @@
 
     <div id="main-screen" class="hidden max-w-md mx-auto p-4 space-y-4">
         <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-white text-sm">
-            <span id="welcomeMsg" class="font-bold text-blue-700 italic">Chào bạn!</span>
+            <span id="welcomeMsg" class="font-bold text-blue-700 italic text-center">Chào bạn!</span>
             <button onclick="location.reload()" class="bg-red-50 px-3 py-1 rounded-full text-red-500 font-bold uppercase text-[10px]">Thoát</button>
         </div>
 
@@ -45,7 +45,7 @@
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <input id="pQty" type="number" placeholder="Số lượng" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border-0 text-center font-black text-xl">
-                <select id="pType" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border-0 font-bold text-blue-600 text-center">
+                <select id="pType" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border-0 font-bold text-blue-600 text-center uppercase">
                     <option value="Nhập">➕ NHẬP</option>
                     <option value="Xuất">➖ XUẤT</option>
                     <option value="Hao hụt">⚠️ HAO HỤT</option>
@@ -55,8 +55,8 @@
         </div>
 
         <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-white">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="font-black text-blue-800 italic text-lg uppercase tracking-tight">Tồn Kho Thực Tế</h2>
+            <div class="flex justify-between items-center mb-4 font-black text-blue-800 italic text-lg uppercase tracking-tight">
+                <span>Tồn Kho Thực Tế</span>
                 <button onclick="fetchData()" class="text-blue-500 font-bold p-2 bg-blue-50 rounded-full">🔄</button>
             </div>
 
@@ -73,7 +73,7 @@
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx99f63pC8wwTKvMyEFcfEjoDw6EtJnSOtBIm7-Wn05xKxf7mIU0GP0c8tJd-FKuGOD/exec";
         let currentUser = "";
-        let fullStockData = []; // Lưu trữ dữ liệu gốc để lọc
+        let fullStockData = [];
 
         async function login() {
             const id = document.getElementById('userId').value.trim();
@@ -98,12 +98,33 @@
             const name = document.getElementById('pName').value.trim();
             const qty = parseFloat(document.getElementById('pQty').value);
             const type = document.getElementById('pType').value;
+            const btn = document.getElementById('btnSave');
+
             if (!name || isNaN(qty)) return alert("Vui lòng nhập đủ!");
-            document.getElementById('btnSave').innerText = "⏳ ĐANG LƯU...";
-            await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ name, qty, type, user: currentUser }) });
-            document.getElementById('pQty').value = "";
-            document.getElementById('btnSave').innerText = "LƯU DỮ LIỆU";
-            fetchData();
+
+            btn.innerText = "⌛ ĐANG GỬI...";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(SCRIPT_URL, { 
+                    method: "POST", 
+                    body: JSON.stringify({ name, qty, type, user: currentUser }) 
+                });
+                
+                // THÔNG BÁO KHI LƯU THÀNH CÔNG
+                alert("✅ CẬP NHẬT THÀNH CÔNG!\n\n🔹 Sản phẩm: " + name + "\n🔹 Loại hình: " + type + "\n🔹 Số lượng: " + qty);
+                
+                document.getElementById('pQty').value = "";
+                // Nếu muốn xóa luôn tên sản phẩm sau khi lưu thì bỏ comment dòng dưới:
+                // document.getElementById('pName').value = "";
+                
+                fetchData();
+            } catch (e) { 
+                alert("❌ LỖI: Không thể lưu dữ liệu!"); 
+            } finally {
+                btn.innerText = "LƯU DỮ LIỆU";
+                btn.disabled = false;
+            }
         }
 
         async function fetchData() {
@@ -119,7 +140,7 @@
                     (t === "Nhập") ? stock[n] += q : stock[n] -= q;
                 });
                 
-                fullStockData = []; // Reset dữ liệu gốc
+                fullStockData = [];
                 dataList.innerHTML = "";
                 for (let item in stock) {
                     fullStockData.push({ name: item, count: stock[item] });
@@ -129,25 +150,23 @@
             } catch (e) { listDiv.innerHTML = "Lỗi load dữ liệu."; }
         }
 
-        // HÀM HIỂN THỊ DANH SÁCH
         function renderList(items) {
             const listDiv = document.getElementById('inventoryList');
             listDiv.innerHTML = "";
             if(items.length === 0) {
-                listDiv.innerHTML = '<div class="text-center py-5 text-slate-400 text-sm italic">Không tìm thấy sản phẩm này</div>';
+                listDiv.innerHTML = '<div class="text-center py-5 text-slate-400 text-sm italic text-center">Không tìm thấy sản phẩm này</div>';
                 return;
             }
             items.forEach(item => {
                 const isLow = item.count <= 10;
                 const color = isLow ? 'text-red-600' : 'text-emerald-600';
-                const warn = isLow ? ' <span class="text-[9px] bg-red-600 text-white px-2 py-0.5 rounded animate-pulse-custom">SẮP HẾT</span>' : '';
+                const warn = isLow ? ' <span class="text-[9px] bg-red-600 text-white px-2 py-0.5 rounded animate-pulse-custom uppercase">Sắp hết</span>' : '';
                 listDiv.innerHTML += '<div class="flex justify-between items-center pt-4 pb-2 border-b border-slate-50">' +
                     '<div><div class="font-bold text-slate-700 uppercase">' + item.name + '</div>' + warn + '</div>' +
                     '<span class="text-xl font-black ' + color + '">' + item.count.toLocaleString() + '</span></div>';
             });
         }
 
-        // HÀM LỌC TÌM KIẾM
         function filterStock() {
             const keyword = document.getElementById('searchInput').value.toLowerCase();
             const filtered = fullStockData.filter(item => 
