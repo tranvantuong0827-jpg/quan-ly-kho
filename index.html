@@ -3,156 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kho & Doanh Thu - Tường</title>
+    <title>Cá Cảnh Kim Phát</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .animate-pulse-custom { animation: pulse 1s infinite; }
-        body { font-family: -apple-system, sans-serif; }
+        body { font-family: -apple-system, sans-serif; background: #f8fafc; }
+        .hidden { display: none; }
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen p-4">
+<body class="p-3">
 
-    <div id="login-screen" class="max-w-md mx-auto mt-10 bg-white p-8 rounded-[2.5rem] shadow-2xl border border-white">
-        <h2 class="text-2xl font-black text-center text-blue-800 mb-6 uppercase italic">Đăng Nhập Hệ Thống</h2>
-        <div class="space-y-4">
-            <input id="userId" type="text" placeholder="Mã nhân viên" class="w-full bg-slate-50 p-4 rounded-2xl border-0 outline-none focus:ring-2 focus:ring-blue-500 font-bold">
-            <input id="userPw" type="password" placeholder="Mật khẩu" class="w-full bg-slate-50 p-4 rounded-2xl border-0 outline-none focus:ring-2 focus:ring-blue-500 font-bold">
-            <button onclick="login()" id="btnLogin" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg uppercase active:scale-95 transition-all">Vào Hệ Thống</button>
+<div id="login-box" class="max-w-md mx-auto mt-10 bg-white p-8 rounded-[2.5rem] card-shadow border border-white">
+    <h2 class="text-2xl font-black text-center text-blue-900 mb-6 uppercase italic">CÁ CẢNH KIM PHÁT</h2>
+    <div class="space-y-4">
+        <input id="u" type="text" placeholder="Tên đăng nhập" class="w-full bg-slate-50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold">
+        <input id="p" type="password" placeholder="Mật khẩu" class="w-full bg-slate-50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold">
+        <button onclick="login()" id="btn-login" class="w-full bg-blue-700 text-white font-black py-4 rounded-2xl uppercase active:scale-95 transition-all shadow-lg">Đăng Nhập</button>
+    </div>
+</div>
+
+<div id="main-app" class="hidden max-w-md mx-auto space-y-4 pb-20">
+    <div class="flex justify-between items-center px-2">
+        <div>
+            <h1 class="font-black text-blue-900 italic text-xl">KIM PHÁT POS</h1>
+            <p class="text-[10px] font-bold text-slate-500 uppercase">Nhân sự: <span id="u-name" class="text-blue-600"></span></p>
+        </div>
+        <button onclick="location.reload()" class="bg-red-50 text-red-500 p-2 rounded-xl text-xs font-bold uppercase">Thoát</button>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+        <div class="bg-blue-700 p-4 rounded-3xl text-white shadow-md">
+            <p class="text-[10px] font-bold uppercase opacity-70">Doanh thu ngày</p>
+            <p id="stat-day" class="text-lg font-black italic">0đ</p>
+        </div>
+        <div class="bg-emerald-700 p-4 rounded-3xl text-white shadow-md">
+            <p class="text-[10px] font-bold uppercase opacity-70">Doanh thu tháng</p>
+            <p id="stat-month" class="text-lg font-black italic">0đ</p>
         </div>
     </div>
 
-    <div id="main-screen" class="hidden max-w-md mx-auto space-y-4">
-        <div class="grid grid-cols-2 gap-3">
-            <div class="bg-gradient-to-br from-blue-600 to-blue-800 p-4 rounded-3xl text-white shadow-lg">
-                <p class="text-[10px] font-bold uppercase opacity-80">Hôm nay</p>
-                <p id="statDay" class="text-xl font-black italic">0đ</p>
-            </div>
-            <div class="bg-gradient-to-br from-emerald-600 to-emerald-800 p-4 rounded-3xl text-white shadow-lg">
-                <p class="text-[10px] font-bold uppercase opacity-80">Tháng này</p>
-                <p id="statMonth" class="text-xl font-black italic">0đ</p>
-            </div>
+    <div class="bg-white p-5 rounded-[2rem] shadow-lg space-y-3 border border-white">
+        <div class="flex gap-2">
+            <button onclick="setTab('Bán hàng')" id="t-ban" class="flex-1 py-2 rounded-xl font-black text-xs uppercase bg-blue-700 text-white shadow-md">🛍️ Bán Ra</button>
+            <button onclick="setTab('Nhập hàng')" id="t-nhap" class="flex-1 py-2 rounded-xl font-black text-xs uppercase bg-slate-100 text-slate-500">📦 Nhập Kho</button>
         </div>
 
-        <div class="bg-white p-6 rounded-[2.5rem] shadow-xl space-y-4 border border-white">
-            <div class="flex justify-between items-center text-xs font-bold px-2">
-                <span id="welcomeMsg" class="text-blue-600 italic">Chào nhân sự!</span>
-                <button onclick="location.reload()" class="text-red-500 uppercase">Thoát</button>
-            </div>
+        <div id="ncc-box" class="hidden animate__animated animate__fadeIn">
+            <input id="common-ncc" type="text" placeholder="Nhập tên Nhà Cung Cấp cho đơn này..." class="w-full bg-yellow-50 p-4 rounded-2xl outline-none border-2 border-yellow-200 font-bold text-sm">
+        </div>
 
-            <input id="pName" list="product-list" type="text" placeholder="Tên sản phẩm..." class="w-full bg-slate-50 p-4 rounded-2xl outline-none border-0 focus:ring-2 focus:ring-blue-500 font-medium">
-            <datalist id="product-list"></datalist>
-            
-            <div class="grid grid-cols-2 gap-3">
-                <input id="pQty" type="number" placeholder="Số lượng" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border-0 text-center font-black text-lg">
-                <input id="pPrice" type="number" placeholder="Giá bán" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border-0 text-center font-black text-blue-600 text-lg">
-            </div>
-            
-            <select id="pType" class="w-full bg-slate-50 p-4 rounded-2xl outline-none border-0 font-bold text-slate-600 text-center uppercase">
-                <option value="Xuất">➖ Bán Ra (Doanh Thu)</option>
-                <option value="Nhập">➕ Nhập Kho</option>
-                <option value="Hao hụt">⚠️ Hao Hụt</option>
+        <div id="items-container" class="space-y-3"></div>
+
+        <button onclick="addItem()" class="w-full py-2 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 font-bold text-xs">+ THÊM MÓN</button>
+
+        <div class="pt-2 border-t border-slate-50">
+            <select id="p-method" class="w-full bg-slate-50 p-3 rounded-xl outline-none font-bold text-slate-600 text-sm mb-3">
+                <option value="Tiền mặt">💵 Tiền mặt</option>
+                <option value="Chuyển khoản">🏦 Chuyển khoản</option>
             </select>
-            <button onclick="saveData()" id="btnSave" class="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg uppercase text-xl active:scale-95 transition-all">Lưu Giao Dịch</button>
-        </div>
-
-        <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-white">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-black text-slate-800 uppercase italic">Tồn Kho</h3>
-                <button onclick="fetchData()" class="text-blue-500 text-xl">🔄</button>
+            <div class="flex justify-between items-center mb-4 px-1">
+                <span class="font-bold text-slate-500 text-sm uppercase">Tổng cộng:</span>
+                <span id="total-bill" class="text-2xl font-black text-red-600 italic">0đ</span>
             </div>
-            <input type="text" id="searchInput" onkeyup="filterStock()" placeholder="🔍 Tìm nhanh sản phẩm..." class="w-full bg-slate-100 p-4 rounded-2xl outline-none border-0 mb-4 text-sm font-medium">
-            <div id="inventoryList" class="space-y-3 divide-y divide-slate-50">Đang tải...</div>
+            <button onclick="submitOrder()" id="btn-save" class="w-full bg-blue-700 text-white font-black py-4 rounded-2xl shadow-lg uppercase text-lg">Lưu Giao Dịch</button>
         </div>
     </div>
 
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzn42CyZ5b8uNKQ7I3ql97uFn2IHwTTK0sGnU3-v4j12h8Sd4YqZ-ndfFYm8GyewbNX/exec";
-        let currentUser = "";
-        let fullStockData = [];
+    <div class="bg-white p-6 rounded-[2rem] shadow-lg border border-white">
+        <h3 class="font-black text-slate-800 uppercase italic mb-3">Kiểm Kho Fast</h3>
+        <input type="text" onkeyup="filterStock(this.value)" placeholder="🔍 Tìm tên sản phẩm..." class="w-full bg-slate-100 p-4 rounded-2xl outline-none border-0 mb-4 text-sm font-medium">
+        <div id="stock-list" class="space-y-3 max-h-80 overflow-y-auto pr-2">Đang tải dữ liệu...</div>
+    </div>
+</div>
 
-        async function login() {
-            const id = document.getElementById('userId').value.trim();
-            const pw = document.getElementById('userPw').value.trim();
-            const btn = document.getElementById('btnLogin');
-            if(!id || !pw) return alert("Nhập đủ ID và Pass!");
-            btn.innerText = "⌛ ĐANG KIỂM TRA...";
-            try {
-                const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "login", id: id, pw: pw }) });
-                const result = await res.json();
-                if (result.status === "success") {
-                    currentUser = result.name;
-                    document.getElementById('login-screen').classList.add('hidden');
-                    document.getElementById('main-screen').classList.remove('hidden');
-                    document.getElementById('welcomeMsg').innerText = "NV: " + currentUser;
-                    fetchData();
-                } else { alert("Sai ID hoặc mật khẩu!"); btn.innerText = "VÀO HỆ THỐNG"; }
-            } catch (e) { alert("Lỗi kết nối!"); btn.innerText = "THỬ LẠI"; }
-        }
+<datalist id="p-datalist"></datalist>
 
-        async function saveData() {
-            const name = document.getElementById('pName').value.trim();
-            const qty = parseFloat(document.getElementById('pQty').value);
-            const price = parseFloat(document.getElementById('pPrice').value) || 0;
-            const type = document.getElementById('pType').value;
-            const btn = document.getElementById('btnSave');
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzn42CyZ5b8uNKQ7I3ql97uFn2IHwTTK0sGnU3-v4j12h8Sd4YqZ-ndfFYm8GyewbNX/exec";
+    let currentUser = "", currentTab = "Bán hàng", productList = [], historyData = [];
 
-            if (!name || isNaN(qty)) return alert("Vui lòng nhập đủ!");
-            btn.innerText = "⌛ ĐANG GỬI..."; btn.disabled = true;
+    function fM(n) { return Number(n || 0).toLocaleString('vi-VN') + "đ"; }
 
-            try {
-                await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ name, qty, price, type, user: currentUser }) });
-                alert("✅ THÀNH CÔNG!\nĐã cập nhật: " + name + "\nSố lượng: " + qty + "\nTổng: " + (qty*price).toLocaleString() + "đ");
-                document.getElementById('pQty').value = "";
-                document.getElementById('pPrice').value = "";
-                fetchData();
-            } catch (e) { alert("Lỗi!"); }
-            finally { btn.innerText = "LƯU GIAO DỊCH"; btn.disabled = false; }
-        }
+    async function login() {
+        const u = document.getElementById('u').value.trim(), p = document.getElementById('p').value.trim();
+        if(!u || !p) return;
+        document.getElementById('btn-login').innerText = "Đang xác thực...";
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=login&u=${u}&p=${p}`).then(r => r.json());
+            if(res.status === 'success') {
+                currentUser = u;
+                document.getElementById('login-box').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                document.getElementById('u-name').innerText = u;
+                refreshData();
+            } else { alert("Sai tài khoản!"); document.getElementById('btn-login').innerText = "Đăng Nhập"; }
+        } catch(e) { alert("Lỗi mạng!"); }
+    }
 
-        async function fetchData() {
-            const listDiv = document.getElementById('inventoryList');
-            try {
-                const res = await fetch(SCRIPT_URL);
-                const data = await res.json();
-                let stock = {}, revDay = 0, revMonth = 0;
-                const now = new Date();
-                const todayStr = now.toLocaleDateString();
-                const month = now.getMonth(), year = now.getFullYear();
+    async function refreshData() {
+        productList = await fetch(`${SCRIPT_URL}?action=getProducts`).then(r => r.json());
+        historyData = await fetch(`${SCRIPT_URL}?action=getHistory`).then(r => r.json());
+        
+        document.getElementById('p-datalist').innerHTML = productList.map(p => `<option value="${p.ten}">`).join('');
+        renderStock();
+        updateStats();
+        if(document.getElementById('items-container').children.length === 0) addItem();
+    }
 
-                data.forEach(row => {
-                    const date = new Date(row[0]), n = row[1], t = row[2], q = Number(row[3]), total = Number(row[7]) || 0;
-                    if (!stock[n]) stock[n] = 0;
-                    (t === "Nhập") ? stock[n] += q : stock[n] -= q;
-                    if (t === "Xuất") {
-                        if (date.toLocaleDateString() === todayStr) revDay += total;
-                        if (date.getMonth() === month && date.getFullYear() === year) revMonth += total;
-                    }
-                });
-
-                document.getElementById('statDay').innerText = revDay.toLocaleString() + "đ";
-                document.getElementById('statMonth').innerText = revMonth.toLocaleString() + "đ";
-                
-                fullStockData = Object.keys(stock).map(k => ({ name: k, count: stock[k] }));
-                document.getElementById('product-list').innerHTML = Object.keys(stock).map(k => `<option value="${k}">`).join("");
-                renderList(fullStockData);
-            } catch (e) { listDiv.innerHTML = "Lỗi load dữ liệu."; }
-        }
-
-        function renderList(items) {
-            const listDiv = document.getElementById('inventoryList');
-            listDiv.innerHTML = items.map(i => `
-                <div class="flex justify-between items-center py-3 border-b border-slate-50">
-                    <span class="font-bold text-slate-700 uppercase text-xs">${i.name} ${i.count <= 10 ? '<span class="bg-red-600 text-white px-2 py-0.5 rounded-md animate-pulse-custom text-[8px] ml-1">HẾT</span>' : ''}</span>
-                    <span class="font-black text-lg ${i.count <= 10 ? 'text-red-600' : 'text-emerald-600'}">${i.count}</span>
+    function renderStock(filter = "") {
+        const list = document.getElementById('stock-list');
+        list.innerHTML = productList
+            .filter(p => p.ten.toLowerCase().includes(filter.toLowerCase()))
+            .map(p => `
+                <div class="flex justify-between items-center py-2 border-b border-slate-50">
+                    <div>
+                        <p class="text-[14px] font-black text-blue-900 leading-tight uppercase">${p.id || '---'}</p>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase">${p.ten}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-black text-lg ${p.ton_kho <= 5 ? 'text-red-600 animate-pulse' : 'text-emerald-600'}">${p.ton_kho}</p>
+                        <p class="text-[8px] font-bold text-slate-400 uppercase">Còn lại</p>
+                    </div>
                 </div>
-            `).join("");
-        }
+            `).join('');
+    }
 
-        function filterStock() {
-            const kw = document.getElementById('searchInput').value.toLowerCase();
-            renderList(fullStockData.filter(i => i.name.toLowerCase().includes(kw)));
+    function addItem() {
+        const id = Date.now();
+        const row = `
+            <div id="row-${id}" class="bg-slate-50 p-4 rounded-2xl relative border border-slate-100">
+                <button onclick="this.parentElement.remove();calcTotal()" class="absolute -top-2 -right-2 bg-white text-red-500 w-6 h-6 rounded-full shadow-md font-bold text-xs flex items-center justify-center border border-red-100">✕</button>
+                <input list="p-datalist" onchange="fillPrice(${id}, this.value)" class="w-full bg-transparent border-b border-slate-200 mb-3 py-1 font-bold outline-none uppercase text-sm" placeholder="Tên món...">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><small class="text-[8px] font-bold text-slate-400 uppercase">Số lượng</small><input type="number" onchange="calcTotal()" class="q w-full bg-transparent font-black text-lg outline-none" value="1"></div>
+                    <div><small class="text-[8px] font-bold text-slate-400 uppercase">Đơn giá</small><input type="number" onchange="calcTotal()" class="p w-full bg-transparent font-black text-lg text-blue-700 outline-none" value="0"></div>
+                </div>
+                <div id="stock-hint-${id}" class="text-[9px] font-bold text-slate-400 mt-1 italic">Kho: --</div>
+            </div>`;
+        document.getElementById('items-container').insertAdjacentHTML('beforeend', row);
+    }
+
+    function fillPrice(id, name) {
+        const p = productList.find(x => x.ten.toLowerCase() === name.toLowerCase());
+        if(p) {
+            const row = document.getElementById(`row-${id}`);
+            row.querySelector('.p').value = (currentTab === "Bán hàng") ? (p.gia_ban || 0) : (p.gia_nhap || 0);
+            document.getElementById(`stock-hint-${id}`).innerText = "Kho: " + p.ton_kho;
+            document.getElementById(`stock-hint-${id}`).setAttribute('data-max', p.ton_kho);
         }
-    </script>
+        calcTotal();
+    }
+
+    function setTab(t) {
+        currentTab = t;
+        document.getElementById('t-ban').className = t === 'Bán hàng' ? 'flex-1 py-2 rounded-xl font-black text-xs uppercase bg-blue-700 text-white shadow-md' : 'flex-1 py-2 rounded-xl font-black text-xs uppercase bg-slate-100 text-slate-500';
+        document.getElementById('t-nhap').className = t === 'Nhập hàng' ? 'flex-1 py-2 rounded-xl font-black text-xs uppercase bg-blue-700 text-white shadow-md' : 'flex-1 py-2 rounded-xl font-black text-xs uppercase bg-slate-100 text-slate-500';
+        document.getElementById('ncc-box').classList.toggle('hidden', t === 'Bán hàng');
+        calcTotal();
+    }
+
+    function calcTotal() {
+        let total = 0;
+        document.querySelectorAll('#items-container > div').forEach(row => {
+            const q = Number(row.querySelector('.q').value), p = Number(row.querySelector('.p').value);
+            total += q * p;
+        });
+        document.getElementById('total-bill').innerText = fM(total);
+    }
+
+    async function submitOrder() {
+        const items = [];
+        let stockError = "";
+        
+        document.querySelectorAll('#items-container > div').forEach(row => {
+            const ten = row.querySelector('input').value, sl = Number(row.querySelector('.q').value), gia = Number(row.querySelector('.p').value);
+            const maxStock = Number(row.querySelector('[data-max]')?.getAttribute('data-max') || 999999);
+            
+            if(ten && sl > 0) {
+                // KIỂM TRA TỒN KHO TRƯỚC KHI GỬI
+                if(currentTab === "Bán hàng" && sl > maxStock) {
+                    stockError = `Sản phẩm "${ten}" chỉ còn ${maxStock}. Bạn không thể bán ${sl}!`;
+                }
+                items.push({ten, sl, gia});
+            }
+        });
+
+        if(stockError) return Swal.fire('Lỗi tồn kho', stockError, 'error');
+        if(items.length === 0) return;
+        
+        const btn = document.getElementById('btn-save');
+        btn.disabled = true; btn.innerText = "Đang xử lý...";
+
+        const payload = {
+            action: "saveOrder",
+            type: currentTab,
+            user: currentUser,
+            method: document.getElementById('p-method').value,
+            commonNCC: document.getElementById('common-ncc').value.trim() || "Kim Phát",
+            items: items
+        };
+
+        try {
+            const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.text());
+            if(res.includes("ERR_STOCK")) {
+                Swal.fire('Lỗi', 'Sản phẩm ' + res.split(":")[1] + ' đã hết hàng trong lúc bạn thao tác!', 'error');
+            } else {
+                Swal.fire({ title: 'Thành công!', icon: 'success', timer: 1000, showConfirmButton: false });
+                document.getElementById('items-container').innerHTML = "";
+                document.getElementById('common-ncc').value = "";
+                refreshData();
+            }
+        } catch(e) { alert("Lỗi lưu đơn!"); }
+        finally { btn.disabled = false; btn.innerText = "Lưu Giao Dịch"; }
+    }
+
+    function updateStats() {
+        const now = new Date(), todayStr = now.toLocaleDateString('vi-VN');
+        let d = 0, m = 0;
+        historyData.forEach(x => {
+            const date = new Date(x["thời gian"] || x.thoigian);
+            if(x.loi === "Bán hàng") {
+                if(date.toLocaleDateString('vi-VN') === todayStr) d += Number(x.thanhtien);
+                if(date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()) m += Number(x.thanhtien);
+            }
+        });
+        document.getElementById('stat-day').innerText = fM(d);
+        document.getElementById('stat-month').innerText = fM(m);
+    }
+
+    function filterStock(val) { renderStock(val); }
+</script>
 </body>
 </html>
